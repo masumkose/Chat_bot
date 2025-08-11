@@ -4,26 +4,29 @@ from openai import OpenAI
 from typing import List
 from langchain_core.documents import Document
 
-# .env dosyasını yükle
+# .env load the env file
 load_dotenv()
 
-# .env dosyasından OpenAI API anahtarını al
-# OPENAI_API_KEY="sizin_openai_api_anahtarınız"
-openai_api_key = os.getenv("OPENAI_API_KEY")
-if not openai_api_key:
-    raise ValueError("OPENAI_API_KEY is not set in the .env file.")
+# .env take the api key
+gemini_api_key = os.getenv("GEMINI_API_KEY")
+if not gemini_api_key:
+    raise ValueError("GEMINI_API_KEY, .env dosyasında ayarlanmamış.")
 
-# OpenAI istemcisini başlat
-client = OpenAI(api_key=openai_api_key)
+# OpenAI for Gemini API
+client = OpenAI(
+    api_key=gemini_api_key,
+    base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+)
 
 def generate_answer(query: str, reranked_docs: List[Document]) -> str:
     """
-    Kullanıcının sorusunu ve rerank edilmiş dökümanları kullanarak bir LLM ile cevap üretir.
+    Generates an answer using the user's question and the re-ranked documents with an LLM.
+    (The inside of this function remains the same)
     """
-    # LLM'e verilecek olan context'i (bağlamı) oluştur
+    # context
     context = "\n\n---\n\n".join([doc.page_content for doc in reranked_docs])
-    
-    # LLM'e gönderilecek olan prompt'u (istem) oluştur
+
+    # To send LLM'e create a promt
     prompt = f"""
     You are an expert Question-Answering assistant. Your goal is to provide accurate and helpful answers based ONLY on the provided context.
     If the context does not contain the information needed to answer the question, say "I do not have enough information to answer this question."
@@ -36,20 +39,20 @@ def generate_answer(query: str, reranked_docs: List[Document]) -> str:
 
     ANSWER:
     """
-    
-    print("Generating answer with LLM...")
 
-    # OpenAI API'sini çağır
+    print("Generating answer with Gemini via OpenAI library...")
+
+    # OpenAI API call, Call the gemini api
     response = client.chat.completions.create(
-        model="gpt-4o-mini",  # Proje gereksinimine uygun model
+        model="gemini-2.5-flash",  # gemini.2.5 flash
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": prompt}
         ],
-        temperature=0.2, # Daha tutarlı cevaplar için düşük bir değer
+        temperature=0.2,
     )
-    
+
     answer = response.choices[0].message.content
     print("Answer generated successfully.")
-    
+
     return answer
