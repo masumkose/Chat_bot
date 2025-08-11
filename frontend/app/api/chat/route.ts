@@ -1,72 +1,77 @@
-// app/api/chat/route.ts
+// bu benim frontend kodum ---> BU SON VE DOĞRU KODU KULLANIN
 
-import { AIStream, readableFromAsyncIterable } from 'ai';
-
-const BACKEND_API_URL = 'http://localhost:8000/chat';
+// ReadableStream'i Vercel AI formatına dönüştürmek için TextEncoder/Decoder kullanacağız.
 
 export const runtime = "edge";
 export const maxDuration = 30;
 
-// Bu yardımcı fonksiyon, bir metni alır ve kelimeleri
-// küçük bir gecikmeyle teker teker "yield" ederek bir
-// asenkron akış oluşturur.
-async function* createWordStream(text: string) {
-  const words = text.split(' ');
-  for (const word of words) {
-    yield word + ' ';
-    await new Promise((resolve) => setTimeout(resolve, 30)); // "Yazıyor" efekti için gecikme
-  }
+/**
+ * Bu fonksiyon, backend'den gelen ham bir metin akışını (text/plain) alır
+ * ve onu Vercel AI SDK'nın beklediği veri akışı formatına dönüştürür.
+ * Her metin parçasının başına `0:` ekler ve sonuna bir newline karakteri koyar.
+ * @param {ReadableStream<Uint8Array>} backendStream - FastAPI'den gelen ham akış.
+ * @returns {Response} - Vercel AI SDK ile uyumlu, formatlanmış bir akış içeren Response nesnesi.
+ */
+function toVercelAiStream(backendStream: ReadableStream<Uint8Array>): Response {
+  const textEncoder = new TextEncoder();
+  const textDecoder = new TextDecoder();
+
+  const transformStream = new TransformStream({
+    async transform(chunk, controller) {
+      // Gelen ham metin parçasını decode et
+      const text = textDecoder.decode(chunk);
+
+      // Vercel AI SDK formatına çevir: 0:"<içerik>"\n
+      const formattedChunk = `0:"${JSON.stringify(text).slice(1, -1)}"\n`;
+      
+      // Formatlanmış parçayı tekrar encode edip akışa ekle
+      controller.enqueue(textEncoder.encode(formattedChunk));
+    },
+  });
+
+  // Gelen backend akışını, bizim transform akışımıza yönlendir (pipe).
+  backendStream.pipeTo(transformStream.writable);
+
+  // Dönüştürülmüş akışın okunabilir tarafını Response olarak döndür.
+  return new Response(transformStream.readable, {
+    headers: {
+      // Content-Type'ı Vercel AI SDK'nın bekleidiği gibi ayarlıyoruz.
+      'Content-Type': 'text/plain; charset=utf-8',
+    },
+  });
 }
 
+
 export async function POST(req: Request) {
-  const { messages } = await req.json();
-
-  // Son kullanıcı mesajını alıyoruz. Backend'iniz sadece query bekliyor.
-  const lastUserMessage = messages[messages.length - 1]?.content;
-
-  if (!lastUserMessage) {
-    return new Response("Mesaj bulunamadı.", { status: 400 });
-  }
-
   try {
-    // 1. Kendi backend'inize isteği gönderin ve tam yanıtı bekleyin.
-    const response = await fetch(BACKEND_API_URL, {
+    const { messages } = await req.json();
+
+    const backendResponse = await fetch(`http://localhost:8000/chat`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query: lastUserMessage }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ messages }),
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Backend Hatası:", errorText);
-      // Hata durumunda, hatayı metin olarak döndürerek frontend'de gösterilmesini sağlayabiliriz.
-      return new Response(`Backend'den hata alındı: ${errorText}`, { status: response.status });
+    if (!backendResponse.ok) {
+      const errorText = await backendResponse.text();
+      console.error(`Backend Error: ${errorText}`);
+      // Hata durumunda da frontend'e anlamlı bir hata mesajı döndür
+      return new Response(errorText, { status: backendResponse.status });
     }
 
-    const resultJson = await response.json();
-    const backendAnswer: string = resultJson.answer;
-
-    if (typeof backendAnswer !== 'string') {
-        throw new Error("Backend'den gelen 'answer' alanı bir metin değil.");
+    if (!backendResponse.body) {
+      return new Response('Backend returned an empty response stream', { status: 500 });
     }
-    
-    // ----- İSTEDİĞİNİZ DEĞİŞİKLİK BURADA BAŞLIYOR -----
 
-    // 2. Backend'den gelen tam metni, kelime kelime stream edecek bir akışa dönüştür.
-    const stream = readableFromAsyncIterable(createWordStream(backendAnswer));
-
-    // 3. Bu ham metin akışını, AI SDK'nın frontend'de anlayacağı formata dönüştür.
-    const aiStream = AIStream(stream);
-    
-    // 4. Sonucu, .toDataStreamResponse() ile aynı işi yapan standart Response ile döndür.
-    return new Response(aiStream.stream, {
-        headers: { "Content-Type": "text/plain; charset=utf-8" },
-    });
-    
-    // ----- DEĞİŞİKLİK BURADA BİTİYOR -----
+    // --- EN ÖNEMLİ DEĞİŞİKLİK BURADA ---
+    // Backend'den gelen ham akışı doğrudan döndürmek yerine,
+    // onu Vercel AI formatına dönüştüren yardımcı fonksiyonumuzu çağırıyoruz.
+    return toVercelAiStream(backendResponse.body);
 
   } catch (error) {
-    console.error("API rotasında bir hata oluştu:", error);
-    return new Response("Sunucu tarafında bir hata oluştu.", { status: 500 });
+    console.error("Error in API route:", error);
+    return new Response('An internal server error occurred.', { status: 500 });
   }
 }
