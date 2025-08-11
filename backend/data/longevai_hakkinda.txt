@@ -1,0 +1,5 @@
+LongevAI, insan ömrünü uzatma ve yaşa bağlı hastalıkları yavaşlatma üzerine odaklanmış bir araştırma ve teknoloji şirketidir. Şirketin temel misyonu, yapay zeka ve makine öğrenmesi modellerini kullanarak biyolojik verilerden anlamlı içgörüler çıkarmaktır. Bu sayede, yaşlanma süreçlerini daha iyi anlamayı ve bu süreçlere müdahale edebilecek potansiyel terapiler geliştirmeyi hedefler.
+
+Şirketin kullandığı temel teknolojilerden biri, genomik verileri analiz eden derin öğrenme algoritmalarıdır. Bu algoritmalar, belirli genetik belirteçler ile uzun ömürlülük arasındaki ilişkileri tespit edebilir. LongevAI'nin araştırma departmanı, bu analizler sonucunda elde edilen hedeflere yönelik ilaç adayları geliştirmektedir.
+
+LongevAI'nin CEO'su Dr. Elara Vance'dir. Dr. Vance, yaşlanma biyolojisi alanında 20 yılı aşkın deneyime sahip bir bilim insanıdır ve şirketin vizyonunu belirleyen kişidir. Şirketin ana araştırma merkezi Cenevre, İsviçre'de bulunmaktadır. 2023 yılı itibarıyla şirketin 150'den fazla çalışanı vardır ve birden fazla klinik deneme yürütmektedir. En bilinen projeleri "Project Chronos" olarak adlandırılmaktadır.
