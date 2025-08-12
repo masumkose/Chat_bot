@@ -80,7 +80,7 @@ First, set up and run the Python backend server.
     ```
 5.  **Run the Backend Server:**
     ```bash
-    uvicorn main:app --host 0.0.0.0 --port 8000
+    uvicorn app.main:app --host 0.0.0.0 --port 8000
     ```
     The backend is now running on `http://localhost:8000`.
 

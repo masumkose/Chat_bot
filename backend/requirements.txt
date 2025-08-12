@@ -6,8 +6,9 @@ langchain-core
 langchain-community
 langchain-openai
 langchain-cohere
-openai1
+openai
 cohere
 tiktoken
 faiss-cpu
 google-generativeai
+pypdf
