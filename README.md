@@ -1,7 +1,5 @@
 # RAG-Powered Financial Investment Assistant
 
-**Project for Elio Verhoef**
-
 ## 1. Project Overview & Chosen Topic
 
 This project is a full-stack, streaming-capable chat assistant designed to answer questions based on a provided set of documents. It uses a Retrieval-Augmented Generation (RAG) pipeline to provide accurate, context-aware answers.
