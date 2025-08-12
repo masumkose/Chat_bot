@@ -34,7 +34,7 @@ export async function POST(req: Request) {
   try {
     const { messages } = await req.json();
 
-    const backendResponse = await fetch(`http://localhost:8000/chat`, {
+    const backendResponse = await fetch(`${process.env.BACKEND_URL}/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

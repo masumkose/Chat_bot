@@ -78,21 +78,17 @@ First, set up and run the Python backend server.
     GEMINI_API_KEY="your-google-gemini-api-key-here"
     COHERE_API_KEY="your-cohere-api-key-here"
     ```
-
-5.  **Ingest Data into Vector Store:**
-    *   *(This is a one-time setup step)*
-    *   Place your source documents (PDFs, TXT files) into the `backend/data` directory.
-    *   Run the ingestion script to build the vector database.
-    ```bash
-    python ingest_data.py
-    ```
-    *(Note: This will create a local vector store, likely in a `vector_store` directory.)*
-
-6.  **Run the Backend Server:**
+5.  **Run the Backend Server:**
     ```bash
     uvicorn main:app --host 0.0.0.0 --port 8000
     ```
     The backend is now running on `http://localhost:8000`.
+
+6.  **Automatic Ingestion:**
+    *   The **first time** you run this command, the server will detect that no vector store exists.
+    *   It will automatically read the documents from the `backend/data` directory, process them, and build the vector database. This may take a few moments depending on the number and size of your documents.
+    *   On all subsequent startups, the server will load the existing vector store instantly.
+
 
 ### Step 2: Frontend Setup
 
