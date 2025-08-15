@@ -112,38 +112,43 @@ const ThreadWelcome: FC = () => {
 };
 
 const ThreadWelcomeSuggestions: FC = () => {
+  // --- YENİ VE KİŞİSELLEŞTİRİLMİŞ ÖNERİLER ---
+  const mySuggestions = [
+    {
+      title: "What are his key skills?",
+      label: "about programming languages & tools",
+      action: "What are Masum's key technical skills?",
+    },
+    {
+      title: "Tell me about a project",
+      label: "and the technologies used",
+      action: "Tell me about one of Masum's recent projects and the technologies he used.",
+    },
+    {
+      title: "Summarize his experience",
+      label: "from his professional background",
+      action: "Can you summarize Masum's professional experience?",
+    },
+    {
+      title: "How can I contact him?",
+      label: "for collaboration or questions",
+      action: "What is the best way to contact Masum?",
+    },
+  ];
+  // ----------------------------------------------------
+
   return (
     // aui-thread-welcome-suggestions
     <div className="grid w-full gap-2 sm:grid-cols-2">
-      {[
-        {
-          title: "What are the advantages",
-          label: "of using Assistant Cloud?",
-          action: "What are the advantages of using Assistant Cloud?",
-        },
-        {
-          title: "Write code to",
-          label: `demonstrate topological sorting`,
-          action: `Write code to demonstrate topological sorting`,
-        },
-        {
-          title: "Help me write an essay",
-          label: `about AI chat applications`,
-          action: `Help me write an essay about AI chat applications`,
-        },
-        {
-          title: "What is the weather",
-          label: "in San Francisco?",
-          action: "What is the weather in San Francisco?",
-        },
-      ].map((suggestedAction, index) => (
+      {mySuggestions.map((suggestedAction, index) => (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 20 }}
           transition={{ delay: 0.05 * index }}
           key={`suggested-action-${suggestedAction.title}-${index}`}
-          // aui-thread-welcome-suggestion-display
+          // Bu stil, mobil cihazlarda sadece ilk iki öneriyi gösterir.
+          // Tablet ve daha büyük ekranlarda ise hepsini gösterir.
           className="[&:nth-child(n+3)]:hidden sm:[&:nth-child(n+3)]:block"
         >
           <ThreadPrimitive.Suggestion

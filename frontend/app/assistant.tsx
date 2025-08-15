@@ -1,24 +1,12 @@
+// app/assistant.tsx
 "use client";
 
 import { AssistantRuntimeProvider } from "@assistant-ui/react";
 import { useChatRuntime } from "@assistant-ui/react-ai-sdk";
 import { Thread } from "@/components/assistant-ui/thread";
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/app-sidebar";
-import { Separator } from "@/components/ui/separator";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 
+// Bu, gömülü (embedded) kullanım için sadeleştirilmiş versiyondur.
+// Artık tam sayfa düzenini (header, sidebar vb.) içermiyor.
 export const Assistant = () => {
   const runtime = useChatRuntime({
     api: "/api/chat",
@@ -26,33 +14,14 @@ export const Assistant = () => {
 
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <SidebarProvider>
-        <div className="flex h-dvh w-full pr-0.5">
-          <AppSidebar />
-          <SidebarInset>
-            <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-              <SidebarTrigger />
-              <Separator orientation="vertical" className="mr-2 h-4" />
-              <Breadcrumb>
-                <BreadcrumbList>
-                  <BreadcrumbItem className="hidden md:block">
-                    <BreadcrumbLink href="https://www.assistant-ui.com/docs/getting-started" target="_blank" rel="noopener noreferrer">
-                      Build Your Own ChatGPT UX
-                    </BreadcrumbLink>
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator className="hidden md:block" />
-                  <BreadcrumbItem>
-                    <BreadcrumbPage>Starter Template</BreadcrumbPage>
-                  </BreadcrumbItem>
-                </BreadcrumbList>
-              </Breadcrumb>
-            </header>
-            <div className="flex-1 overflow-hidden">
-              <Thread />
-            </div>
-          </SidebarInset>
-        </div>
-      </SidebarProvider>
+      {/*
+        Bu sarmalayıcı div, bileşenin kendisine verilen alana tam olarak
+        yayılmasını ve sohbet akışının düzgün çalışmasını sağlar.
+      */}
+      <div className="relative flex h-full flex-col">
+        {/* Thread bileşeni, mesajları ve giriş alanını içerir */}
+        <Thread />
+      </div>
     </AssistantRuntimeProvider>
   );
 };

@@ -49,3 +49,5 @@ async def chat(chat_request: ChatRequest, request: Request):
     except Exception as e:
         print(f"Error in /chat endpoint: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+    
+    
