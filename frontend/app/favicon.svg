@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512"><svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background: A slightly rounded square. Color is a dark charcoal. -->
+    <rect width="512" height="512" rx="64" fill="#2D3748"></rect>
+    
+    <!-- Text: Your initials "MK". Centered and white. -->
+    <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="240" font-family="Arial, sans-serif" font-weight="bold">
+        MK
+    </text>
+</svg><style>@media (prefers-color-scheme: light) { :root { filter: none; } }
+@media (prefers-color-scheme: dark) { :root { filter: none; } }
+</style></svg>

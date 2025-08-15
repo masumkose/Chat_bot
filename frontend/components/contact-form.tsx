@@ -4,19 +4,29 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea"; // Textarea bileşenini import etmeniz gerekebilir
+import { Textarea } from "@/components/ui/textarea";
 
 export const ContactForm = () => {
   const [status, setStatus] = useState("");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    // Ensure the environment variable is loaded
+    const formspreeUrl = process.env.NEXT_PUBLIC_FORMSPREE_URL;
+    if (!formspreeUrl) {
+      setStatus("Configuration error: Form URL is missing.");
+      return;
+    }
+
     setStatus("Sending...");
     const form = e.currentTarget;
     const data = new FormData(form);
     
     try {
-      const response = await fetch("https://formspree.io/f/movlbrvo", { // BURAYI KENDİ FORMSPREE URL'NİZ İLE DEĞİŞTİRİN
+      // --- UPDATE THIS LINE ---
+      const response = await fetch(formspreeUrl, {
+      // ------------------------
         method: "POST",
         body: data,
         headers: {
