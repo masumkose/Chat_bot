@@ -97,7 +97,7 @@ app = FastAPI(lifespan=lifespan)
 # Your existing CORS and routing logic remains the same
 origins = [
     "http://localhost:3000",
-    "https://your-frontend-url.com", # IMPORTANT: Replace with your Vercel URL
+    "https://chat-bot-seven-wheat.vercel.app/", # IMPORTANT: Replace with your Vercel URL
 ]
 
 app.add_middleware(
