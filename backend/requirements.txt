@@ -12,3 +12,4 @@ tiktoken
 faiss-cpu
 google-generativeai
 pypdf
+boto3
