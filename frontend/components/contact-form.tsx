@@ -12,7 +12,6 @@ export const ContactForm = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Ensure the environment variable is loaded
     const formspreeUrl = process.env.NEXT_PUBLIC_FORMSPREE_URL;
     if (!formspreeUrl) {
       setStatus("Configuration error: Form URL is missing.");
@@ -24,9 +23,7 @@ export const ContactForm = () => {
     const data = new FormData(form);
     
     try {
-      // --- UPDATE THIS LINE ---
       const response = await fetch(formspreeUrl, {
-      // ------------------------
         method: "POST",
         body: data,
         headers: {
@@ -40,7 +37,9 @@ export const ContactForm = () => {
       } else {
         setStatus("Oops! There was a problem submitting your form.");
       }
-    } catch (error) {
+    // --- THE CORRECT FIX: Use a catch block without a variable ---
+    } catch {
+    // ----------------------------------------------------------------
       setStatus("Oops! There was a problem submitting your form.");
     }
   };

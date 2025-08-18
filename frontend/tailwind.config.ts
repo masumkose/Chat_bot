@@ -4,7 +4,7 @@ import type { Config } from "tailwindcss";
 
 const config = {
   // If you already have a darkMode key, replace it. If not, add it.
-  darkMode: ["class"], 
+  darkMode: "class", 
   content: [
     './pages/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',

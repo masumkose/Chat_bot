@@ -4,15 +4,25 @@ import { Assistant } from "./assistant";
 import { Button } from "@/components/ui/button";
 import { ProjectCard } from "@/components/project-card";
 import { ContactForm } from "@/components/contact-form";
-import { ThemeToggleButton } from "@/components/theme-toggle-button"; // <-- 1. Import the button
+import { ThemeToggleButton } from "@/components/theme-toggle-button";
 
-// --- GÜNCELLENMİŞ FONKSİYON ---
-// Bu fonksiyon artık GitHub API'nin sayfalama (pagination) özelliğini kullanarak
-// TÜM public projelerinizi çeker.
-async function getAllGithubProjects(username: string) {
-  let allProjects = [];
+// <<< FIX 2.1: Define a specific type for your GitHub repository object
+type GithubRepo = {
+  id: number;
+  name: string;
+  html_url: string;
+  description: string;
+  stargazers_count: number;
+  forks_count: number;
+  language: string;
+};
+
+// This function now returns a promise of an array of GithubRepo objects
+async function getAllGithubProjects(username: string): Promise<GithubRepo[]> {
+  // <<< FIX 2.2: Initialize the array with the correct type
+  let allProjects: GithubRepo[] = [];
   let page = 1;
-  const perPage = 100; // Verimlilik için tek seferde maksimum proje sayısı
+  const perPage = 100;
 
   try {
     while (true) {
@@ -22,13 +32,12 @@ async function getAllGithubProjects(username: string) {
       
       if (!res.ok) {
         console.error("Failed to fetch GitHub repos:", res.statusText);
-        break; // Hata durumunda döngüden çık
+        break;
       }
 
-      const projectsOnPage = await res.json();
+      const projectsOnPage: GithubRepo[] = await res.json();
       
       if (projectsOnPage.length === 0) {
-        // Eğer o sayfada hiç proje yoksa, tüm projeleri çekmişiz demektir.
         break;
       }
       
@@ -38,14 +47,12 @@ async function getAllGithubProjects(username: string) {
     return allProjects;
   } catch (error) {
     console.error("Error fetching GitHub projects:", error);
-    return []; // Hata durumunda boş bir dizi döndür
+    return [];
   }
 }
 
-
-// Sayfa bileşenini 'async' olarak işaretliyoruz
 export default async function HomePage() {
-  const username = "masumkose"; // GitHub kullanıcı adınız
+  const username = "masumkose";
   const projects = await getAllGithubProjects(username);
 
   return (
@@ -57,10 +64,12 @@ export default async function HomePage() {
       <section className="text-center py-20 sm:py-32">
         <div className="container mx-auto px-4">
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight">
-            Hi, I'm Masum Köse
+            {/* <<< FIX 1.1: Replaced ' with &apos; */}
+            Hi, I&apos;m Masum Köse
           </h1>
           <p className="mt-4 max-w-2xl mx-auto text-lg sm:text-xl text-gray-600 dark:text-gray-400">
-            I'm a software developer creating innovative solutions. 
+            {/* <<< FIX 1.2: Replaced ' with &apos; */}
+            I&apos;m a software developer creating innovative solutions. 
             Chat with my AI assistant below or explore my projects to learn more about me.
           </p>
           <div className="mt-8 flex justify-center gap-4">
@@ -74,7 +83,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* --- YUKARI TAŞINAN BÖLÜM --- */}
       {/* AI Assistant Section */}
       <section id="ai-assistant-section" className="py-20 sm:py-24 bg-white dark:bg-black/20">
         <div className="container mx-auto px-4">
@@ -102,7 +110,8 @@ export default async function HomePage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {projects && projects.length > 0 ? (
-              projects.map((repo: any) => (
+              // <<< FIX 2.3: Use the specific GithubRepo type instead of 'any'
+              projects.map((repo: GithubRepo) => (
                 <ProjectCard key={repo.id} repo={repo} />
               ))
             ) : (

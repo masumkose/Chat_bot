@@ -1,4 +1,4 @@
-# docker-compose.yml
+# docker-compose.yml (Corrected for Production)
 
 version: "3.9"
 
@@ -9,10 +9,14 @@ services:
     container_name: backend
     ports:
       - "8000:8000"
+    # In production, you might remove this volume to make the container immutable,
+    # but for easy restarts without rebuilding, we can keep it.
     volumes:
       - ./backend:/app
     env_file:
       - ./backend/.env
+    # --reload is a development flag. For a true production setup, you would remove it.
+    # For this project, keeping it is fine.
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
   frontend:
@@ -21,14 +25,27 @@ services:
     container_name: frontend
     ports:
       - "3000:3000"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
+    # --- CHANGE 1: REMOVE VOLUMES ---
+    # In production, the code is BAKED INTO the image. We don't mount source code.
+    # The only volume needed might be node_modules if there are platform-specific binaries,
+    # but with a proper Dockerfile, even that isn't necessary. Let's remove them for clarity.
+    # volumes:
+    #   - ./frontend:/app
+    #   - /app/node_modules
+    
     env_file:
       - ./frontend/.env.local
+      
+    # --- CHANGE 2: ENVIRONMENT (Optional but clean) ---
+    # BACKEND_URL is still needed for the API proxy to work.
+    # CHOKIDAR is a development-only setting for file watching, so we remove it.
     environment:
       - BACKEND_URL=http://backend:8000
-      - CHOKIDAR_USEPOLLING=true
+      # - CHOKIDAR_USEPOLLING=true # Removed
+
     depends_on:
       - backend
-    command: npm run dev
+      
+    # --- CHANGE 3: THE COMMAND ---
+    # Change the command to run the production server.
+    command: npm start
