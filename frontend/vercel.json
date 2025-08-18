@@ -2,8 +2,18 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "builds": [
     {
-      "src": "next.config.ts",
+      "src": "backend/app/main.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "frontend/next.config.ts",
       "use": "@vercel/next"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/chat",
+      "destination": "/backend/app/main.py"
     }
   ]
 }
