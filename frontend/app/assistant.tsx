@@ -17,7 +17,7 @@ export const Assistant = () => {
   useEffect(() => {
     const wakeUpBackend = async () => {
       try {
-        const healthUrl = process.env.BACKEND_URL;
+        const healthUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
         if (!healthUrl) {
           throw new Error("Backend URL is not configured.");
         }
