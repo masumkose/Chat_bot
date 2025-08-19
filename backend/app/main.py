@@ -98,8 +98,6 @@ app = FastAPI(lifespan=lifespan)
 origins = [
     "http://localhost:3000",
     "https://chat-bot-teal-omega.vercel.app", # IMPORTANT: Replace with your Vercel URL
-    "https://chat-w2eg4rpk0-masums-projects-c3fdc941.vercel.app", # IMPORTANT: Replace with your Vercel URL
-    "https://chat-bot-git-master-masums-projects-c3fdc941.vercel.app", # IMPORTANT: Replace with your Vercel URL
 ]
 
 app.add_middleware(
