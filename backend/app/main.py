@@ -97,7 +97,7 @@ app = FastAPI(lifespan=lifespan)
 # Your existing CORS and routing logic remains the same
 origins = [
     "http://localhost:3000",
-    "https://chat-bot-git-master-masums-projects-c3fdc941.vercel.app", # IMPORTANT: Replace with your Vercel URL
+    "https://chat-bot-teal-omega.vercel.app", # IMPORTANT: Replace with your Vercel URL
     "https://chat-w2eg4rpk0-masums-projects-c3fdc941.vercel.app", # IMPORTANT: Replace with your Vercel URL
     "https://chat-bot-git-master-masums-projects-c3fdc941.vercel.app", # IMPORTANT: Replace with your Vercel URL
 ]
