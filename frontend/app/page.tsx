@@ -91,6 +91,7 @@ export default async function HomePage() {
             <p className="mt-3 max-w-xl mx-auto text-md text-gray-500 dark:text-gray-400">
               You can ask my assistant anything about my projects, technical skills, or experience. 
               It provides instant answers based on my documents thanks to the RAG pipeline in the backend.
+              (Please note: The AI assistant may take up to a minute to start up on the first request.)
             </p>
           </div>
           <div className="max-w-3xl mx-auto h-[600px] border dark:border-gray-700 rounded-xl shadow-2xl overflow-hidden flex flex-col">
