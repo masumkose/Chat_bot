@@ -1,86 +1,78 @@
 // frontend/app/assistant.tsx
 "use client";
 
-import { AssistantRuntimeProvider, useAssistantRuntime } from "@assistant-ui/react";
+import { AssistantRuntimeProvider } from "@assistant-ui/react";
 import { useChatRuntime } from "@assistant-ui/react-ai-sdk";
-import { Thread } from "@/components/assistant-ui/thread";
+import { Thread, type VercelMessage } from "@/components/assistant-ui/thread"; // Import VercelMessage type
 import { useEffect, useState } from "react";
 
-// A custom hook to manage the backend wake-up sequence
-const useBackendWakeUp = () => {
-  const runtime = useAssistantRuntime();
-  const [hasWakeUpAttempted, setHasWakeUpAttempted] = useState(false);
+// Define the type for our system message state
+type SystemMessage = VercelMessage | null;
 
+export const Assistant = () => {
+  const [systemMessage, setSystemMessage] = useState<SystemMessage>(null);
+  const [isBackendWakingUp, setIsBackendWakingUp] = useState(true);
+
+  // This effect runs once on component mount to wake up the backend
   useEffect(() => {
-    // Only run this effect once, and only if the runtime is ready.
-    if (!runtime || hasWakeUpAttempted) {
-      return;
-    }
-
-    // Mark that we are attempting to wake up the backend.
-    setHasWakeUpAttempted(true);
+    // Set the initial "waking up" message
+    setSystemMessage({
+      id: "system-waking-up",
+      role: "assistant",
+      content: "Waking up the AI assistant... this may take a moment.",
+    });
 
     const wakeUpBackend = async () => {
-      // 1. Define a temporary "waking up" message with a unique ID.
-      const wakingMessage = {
-        id: "system-waking-up",
-        role: "assistant" as const,
-        content: [{ type: "text" as const, text: "Waking up the AI assistant... this may take a moment." }],
-      };
-      runtime.thread.addMessage(wakingMessage);
-
       try {
-        // 2. Call the new /health endpoint. The time this fetch takes IS the cold start time.
-        // We use a specific environment variable for the health check URL.
         const healthUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
         if (!healthUrl) {
           throw new Error("Backend URL is not configured.");
         }
         
+        // Call the /health endpoint. The time this fetch takes IS the cold start time.
         await fetch(`${healthUrl}/health`);
 
-        // 3. If successful, remove the "waking up" message.
-        // The user can now start chatting with a warm backend.
-        runtime.thread.setMessages(messages =>
-          messages.filter(m => m.id !== wakingMessage.id)
-        );
+        // If successful, clear the system message and mark backend as ready.
+        setSystemMessage(null);
+        setIsBackendWakingUp(false);
 
       } catch (error) {
         console.error("Backend wake-up failed:", error);
-        // 4. If it fails, replace the "waking up" message with an error.
-        const errorMessage = {
+        // If it fails, replace the message with an error.
+        setSystemMessage({
             id: "system-error",
-            role: "assistant" as const,
-            content: [{ type: "text" as const, text: "Sorry, I couldn't connect to the AI assistant. Please try refreshing the page." }],
-        };
-        runtime.thread.setMessages(messages =>
-            messages.filter(m => m.id !== wakingMessage.id).concat(errorMessage)
-        );
+            role: "assistant",
+            content: "Sorry, I couldn't connect to the AI assistant. Please try refreshing the page.",
+        });
       }
     };
 
     wakeUpBackend();
-  }, [runtime, hasWakeUpAttempted]);
-};
+  }, []); // Empty dependency array ensures this runs only once
 
-
-export const Assistant = () => {
   const runtime = useChatRuntime({
     api: "/api/chat",
+    // Conditionally provide the initial messages
+    initialMessages: systemMessage ? [systemMessage] : [],
   });
+  
+  // This effect will sync our local systemMessage with the runtime's state
+  useEffect(() => {
+    if (systemMessage) {
+      // If our system message exists, make sure it's the only message in the thread
+      runtime.thread.setMessages([systemMessage]);
+    } else if (isBackendWakingUp === false && runtime.thread.messages.some(m => m.id === 'system-waking-up')) {
+      // If backend is awake and the waking message is still there, clear it
+      runtime.thread.setMessages([]);
+    }
+  }, [systemMessage, isBackendWakingUp, runtime.thread]);
 
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <WakeUpManager />
       <div className="relative flex h-full flex-col">
-        <Thread />
+        {/* We pass the disabled prop to the Thread's composer to prevent user input while waking up */}
+        <Thread composerProps={{ disabled: isBackendWakingUp }} />
       </div>
     </AssistantRuntimeProvider>
   );
-};
-
-// This is a "headless" component that just runs our hook.
-const WakeUpManager = () => {
-  useBackendWakeUp();
-  return null;
 };
