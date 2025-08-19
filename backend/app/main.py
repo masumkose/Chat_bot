@@ -113,3 +113,11 @@ app.include_router(routes.router)
 @app.get("/")
 def read_root():
     return {"message": "Welcome to the Portfolio RAG Chatbot API"}
+
+@app.get("/health", tags=["Health Check"])
+async def health_check():
+    """
+    Simple health check endpoint to confirm the API is running.
+    Used by the frontend to "wake up" the service on Render.
+    """
+    return {"status": "ok"}
