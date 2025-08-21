@@ -9,24 +9,21 @@ from .rag_pipeline.chunking import load_and_chunk_documents
 from .rag_pipeline.embedding import get_embedding_function, create_vector_store
 from .api import routes
 
-# --- ADDED: Helper function to download RAG data from S3 ---
+# --- Helper function to download RAG data from S3 ---
 def download_data_from_s3():
     """
     Downloads RAG source documents from a private S3 bucket if credentials are set.
     """
     print("Checking for data from S3...")
     
-    # These credentials must be set as environment variables in Render
     bucket_name = os.getenv("AWS_S3_BUCKET_NAME")
     aws_access_key_id = os.getenv("AWS_ACCESS_KEY_ID")
     aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY")
     
     if not all([bucket_name, aws_access_key_id, aws_secret_access_key]):
         print("S3 environment variables not configured. Skipping S3 download.")
-        print("The application will attempt to use local data if it exists.")
         return
 
-    # This is the local directory where files will be stored inside the container
     local_data_dir = "./data"
     os.makedirs(local_data_dir, exist_ok=True)
     
@@ -47,7 +44,6 @@ def download_data_from_s3():
         print(f"Found {len(objects)} files in S3 bucket. Starting download to '{local_data_dir}'...")
         for obj in objects:
             file_key = obj['Key']
-            # Prevent downloading empty "folder" objects
             if file_key.endswith('/'):
                 continue
             
@@ -58,30 +54,20 @@ def download_data_from_s3():
         print("S3 download complete.")
     except Exception as e:
         print(f"An error occurred while downloading from S3: {e}")
-        # Depending on requirements, you might want to raise the exception
-        # to stop the application from starting with incomplete data.
-        # raise e
 
-# --- MODIFIED: The LIFESPAN MANAGER ---
+
+# --- The LIFESPAN MANAGER ---
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
     Handles application startup and shutdown events.
     """
     print("Application starting...")
-    
-    # --- ADDED: Call the S3 download function on startup ---
     download_data_from_s3()
     
     print("RAG pipeline starting...")
-    
-    # 1. Load and chunk documents from the (now populated) data directory
     documents = load_and_chunk_documents(data_path="./data")
-    
-    # 2. Get the embedding function
     embedding_function = get_embedding_function()
-    
-    # 3. Create the vector store and save it to the application's state
     vector_store = create_vector_store(documents, embedding_function)
     app.state.vector_store = vector_store
 
@@ -94,7 +80,8 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-# Your existing CORS and routing logic remains the same
+# --- THE FIX IS HERE: ADD THE CORS MIDDLEWARE ---
+# Define the list of allowed origins
 origins = [
     "http://localhost:3000",  # For local development
 ]
@@ -107,6 +94,7 @@ if production_domain:
     print(f"Adding production domain to CORS origins: {production_domain}")
     origins.append(production_domain)
 
+# Add the middleware to the FastAPI app
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -114,6 +102,7 @@ app.add_middleware(
     allow_methods=["*"],  # Allows all methods (GET, POST, OPTIONS, etc.)
     allow_headers=["*"],  # Allows all headers
 )
+# ---------------------------------------------------
 
 app.include_router(routes.router)
 
