@@ -1,145 +1,111 @@
-# RAG-Powered Financial Investment Assistant
+# AI-Powered Portfolio & Personal Chat Assistant
 
-## 1. Project Overview & Chosen Topic
-
-This project is a full-stack, streaming-capable chat assistant designed to answer questions based on a provided set of documents. It uses a Retrieval-Augmented Generation (RAG) pipeline to provide accurate, context-aware answers.
-
-*   **Chosen Topic:** Financial Investment Principles
-*   **Document Sources:** The knowledge base for this assistant was built from the following sources:
-    *   `Value Investing, a Modern Approach, Yuqin Guo`
-    *   `The Eight Principles of Value Investing By Scott Clemons and Michael Kim October, 2013`
-    *   `FINANCING THE UNITED NATIONS, Max-Otto Baumann, Sebastian Haug April 2024`
-    *   `Gemini produces txt file about finance terms.`
-
-The assistant leverages a Python/FastAPI backend for the RAG logic and a Next.js frontend for a reactive user interface, with real-time streaming of responses from the Google Gemini LLM.
+**A full-stack, AI-driven portfolio website built by Muhammet Köse.**
 
 ---
 
-## 2. Technical Architecture
+### 🚀 Live Demo
 
-The application is split into two main components:
+**Interact with the deployed application here:**
 
-1.  **Frontend (Next.js & Vercel AI SDK):** A user-friendly chat interface that handles user input and renders the streaming responses from the backend.
-2.  **Backend (Python, FastAPI & Gemini):** A robust API that performs the core RAG logic:
-    *   Receives the conversation history from the frontend.
-    *   Performs semantic search on a vector database to find relevant document chunks.
-    *   Re-ranks the retrieved documents for improved context quality.
-    *   Constructs a detailed prompt with the user's question and the retrieved context.
-    *   Streams the response from the Google Gemini API back to the frontend.
-
-For a more detailed data flow diagram, please see **`docs/ARCHITECTURE.md`**.
+**[portfolio.masumkose.com](https://portfolio.masumkose.com)** <!-- <<< IMPORTANT: Replace with your final custom domain or .vercel.app URL -->
 
 ---
 
-## 3. Setup and Installation Instructions
+## 1. Project Overview
 
-Please follow these steps to set up and run the project locally.
+This project is a modern, full-stack portfolio website designed to showcase my skills and projects. It features a unique, personalized AI assistant that acts as an interactive "living resume."
+
+The assistant uses a **Retrieval-Augmented Generation (RAG)** pipeline to answer questions about my professional background, technical skills, and academic history. The knowledge base for this pipeline is built from a private collection of my personal documents (resumes, certificates, etc.), which are securely stored and managed.
+
+## 2. Key Features
+
+*   **Serverless Deployment:** The entire application is deployed on a modern serverless infrastructure (Vercel & Render), ensuring high availability and scalability with zero server maintenance.
+*   **Containerized Backend:** The Python backend is fully containerized with Docker, making it portable, reproducible, and easy to deploy.
+*   **Real-time Streaming:** The AI assistant streams responses token-by-token from the Google Gemini API for a highly interactive and engaging user experience.
+*   **Secure RAG Pipeline:** Private source documents are securely fetched from a private AWS S3 bucket during the backend's startup, ensuring they are never exposed in the codebase or version control.
+*   **Dynamic Project Showcase:** The portfolio section dynamically fetches and displays all of my public projects directly from the GitHub API, ensuring it's always up-to-date.
+
+## 3. Tech Stack
+
+| Component     | Technology                                                 |
+| :------------ | :--------------------------------------------------------- |
+| **Frontend**  | Next.js, React, TypeScript, Tailwind CSS, Assistant UI     |
+| **Backend**   | Python, FastAPI, LangChain, Google Gemini                  |
+| **Deployment**| Vercel (Frontend), Render (Backend), Docker                |
+| **Data Storage**| AWS S3 (for private RAG documents)                         |
+
+---
+
+## 4. Architecture
+
+The application uses a decoupled frontend/backend architecture, a modern standard for creating scalable and maintainable web applications.
+
+For a more detailed breakdown of the data flow, see the **`Docs/ARCHITECTURE.md`** file.
+
+---
+
+## 5. Cloud Deployment (Vercel & Render)
+
+This project is designed for a streamlined, Git-based deployment workflow.
+
+### Backend Setup (Render)
+
+1.  Create a new **Web Service** on Render and connect this GitHub repository.
+2.  Set the **Environment** to **`Docker`**.
+3.  Set the **Root Directory** to **`backend`**. This tells Render where to find the `Dockerfile`.
+4.  Add the following **Environment Variables** in the Render dashboard to provide the necessary secrets:
+    *   `DOMAIN_URL`
+    *   `GEMINI_API_KEY`
+    *   `COHERE_API_KEY`
+    *   `AWS_S3_BUCKET_NAME`
+    *   `AWS_ACCESS_KEY_ID`
+    *   `AWS_SECRET_ACCESS_KEY`
+
+### Frontend Setup (Vercel)
+
+1.  Create a new **Project** on Vercel and import this GitHub repository.
+2.  Set the **Root Directory** in the project settings to **`frontend`**.
+3.  Add the following **Environment Variable** in the Vercel dashboard:
+    *   `BACKEND_URL`: The public URL of the deployed backend service from Render.
+4.  Pushing to the `master`/`main` branch will automatically trigger new deployments on both services.
+
+---
+
+## 6. Local Development
+
+The entire application stack can be run locally using Docker Compose for a consistent development environment.
 
 ### Prerequisites
+*   Docker & Docker Compose
+*   Git
 
-*   **Python 3.9+** and `pip`
-*   **Node.js 18+** and `npm` (or `yarn`)
-*   A valid **Google Gemini API Key**
-*   A valid **Cohere API Key**
+### Steps
 
-### Step 1: Backend Setup
-
-First, set up and run the Python backend server.
-
-1.  **Navigate to the backend directory:**
+1.  **Clone the repository:**
     ```bash
-    cd backend
+    git clone https://github.com/masumkose/portfolio-website.git
+    cd portfolio-website
     ```
 
-2.  **Create and activate a virtual environment:**
+2.  **Create Environment Files:**
+    *   In the `backend` folder, create a `.env` file and add     
+        `DOMAIN_URL=...`
+        `GEMINI_API_KEY=...`
+        `COHERE_API_KEY=...`
+        `AWS_S3_BUCKET_NAME=...`
+        `AWS_ACCESS_KEY_ID=...`
+        `AWS_SECRET_ACCESS_KEY=...`
+    *   In the `frontend` folder, create a `.env.local` file and add 
+        `BACKEND_URL=http://backend:8000`
+        `NEXT_PUBLIC_FORMSPREE_URL=...`
+        `NEXT_PUBLIC_BACKEND_URL=...`
+
+3.  **Run the application:**
     ```bash
-    # For macOS/Linux
-    python3 -m venv venv
-    source venv/bin/activate
-
-    # For Windows
-    python -m venv venv
-    .\venv\Scripts\activate
+    docker-compose up --build
     ```
-
-3.  **Install Python dependencies:**
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-4.  **Configure Environment Variables:**
-    *   Create a `.env` file in the `backend` directory.
-    *   Copy the contents of `.env.example` into it and add your Gemini API key.
-
-    **File: `backend/.env`**
-    ```
-    GEMINI_API_KEY="your-google-gemini-api-key-here"
-    COHERE_API_KEY="your-cohere-api-key-here"
-    ```
-5.  **Run the Backend Server:**
-    ```bash
-    uvicorn app.main:app --host 0.0.0.0 --port 8000
-    ```
-    The backend is now running on `http://localhost:8000`.
-
-6.  **Automatic Ingestion:**
-    *   The **first time** you run this command, the server will detect that no vector store exists.
-    *   It will automatically read the documents from the `backend/data` directory, process them, and build the vector database. This may take a few moments depending on the number and size of your documents.
-    *   On all subsequent startups, the server will load the existing vector store instantly.
-
-
-### Step 2: Frontend Setup
-
-Now, set up and run the Next.js frontend in a separate terminal.
-
-1.  **Navigate to the frontend directory:**
-    ```bash
-    cd frontend
-    ```
-
-2.  **Install Node.js dependencies:**
-    ```bash
-    npm install
-    ```
-
-3.  **Configure Environment Variables:**
-    *   Create a `.env.local` file in the `frontend` directory.
-    *   This file tells the frontend where the backend is running.
-
-    **File: `frontend/.env.local`**
-    ```
-    BACKEND_URL="http://localhost:8000"
-    ```
-
-4.  **Run the Frontend Development Server:**
-    ```bash
-    npm run dev
-    ```
-
-### Step 3: Usage
-
-Open your web browser and navigate to **`http://localhost:3000`**. You can now start chatting with the assistant.
-
----
-
-## 4. Assumptions & Trade-offs
-
-During development, several decisions were made:
-
-*   **Assumption: Local Vector Store:**
-    *   I have used a local file-based vector store (e.g., FAISS or ChromaDB) for simplicity and to avoid requiring a separate database server.
-    *   **Trade-off:** This is great for local development but is not suitable for a production environment, which would require a persistent, scalable vector database solution.
-
-*   **Assumption: Gemini via OpenAI SDK:**
-    *   I am using the `openai` Python library to interact with the Gemini API via its OpenAI compatibility endpoint.
-    *   **Trade-off:** While this provides a familiar interface, it might not support all of Gemini's native features (like advanced function calling or specific safety settings). Using the native `google-generativeai` library would offer more control at the cost of a different implementation pattern.
-
-*   **Trade-off: API Proxy Route in Next.js:**
-    *   The frontend does not call the Python backend directly. Instead, it calls a Next.js API route (`/api/chat`) which then "proxies" the request to the Python backend.
-    *   **Pro:** This is a best practice for security. It hides the backend's architecture and URL from the public-facing client and protects against CORS issues. It also allows for frontend-side transformation of the data stream, as was necessary here.
-    *   **Con:** This adds one extra network hop, which introduces a minuscule amount of latency. For this application, the trade-off is well worth it.
-
-*   **Trade-off: Reranking Step:**
-    *   The RAG pipeline includes a reranking step after the initial document retrieval.
-    *   **Pro:** This significantly improves the quality of the context provided to the LLM by pushing the most relevant documents to the top, leading to more accurate answers.
-    *   **Con:** Reranking adds a small computational cost and latency to each request.
+    or use make up 
+    check for more details in the Makefile
+    
+4.  Access the frontend at `http://localhost:3000`.

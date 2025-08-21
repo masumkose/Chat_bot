@@ -96,17 +96,16 @@ app = FastAPI(lifespan=lifespan)
 
 # Your existing CORS and routing logic remains the same
 origins = [
-    "http://localhost:3000",
-    "https://chat-bot-teal-omega.vercel.app", # IMPORTANT: Replace with your Vercel URL
+    "http://localhost:3000",  # For local development
 ]
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# Get the production domain from an environment variable
+production_domain = os.getenv("DOMAIN_URL")
+
+# If the environment variable exists and is not empty, add it to the list
+if production_domain:
+    print(f"Adding production domain to CORS origins: {production_domain}")
+    origins.append(production_domain)
 
 app.include_router(routes.router)
 
