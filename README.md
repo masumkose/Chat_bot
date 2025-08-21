@@ -8,7 +8,7 @@
 
 **Interact with the deployed application here:**
 
-**[portfolio.masumkose.com](https://portfolio.masumkose.com)** <!-- <<< IMPORTANT: Replace with your final custom domain or .vercel.app URL -->
+**[masum-kose-portfolio.vercel.app](https://masum-kose-portfolio.vercel.app/)** <!-- <<< IMPORTANT: Replace with your final custom domain or .vercel.app URL -->
 
 ---
 
@@ -107,5 +107,4 @@ The entire application stack can be run locally using Docker Compose for a consi
     ```
     or use make up 
     check for more details in the Makefile
-    
 4.  Access the frontend at `http://localhost:3000`.
