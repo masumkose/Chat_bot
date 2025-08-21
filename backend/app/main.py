@@ -107,6 +107,14 @@ if production_domain:
     print(f"Adding production domain to CORS origins: {production_domain}")
     origins.append(production_domain)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods (GET, POST, OPTIONS, etc.)
+    allow_headers=["*"],  # Allows all headers
+)
+
 app.include_router(routes.router)
 
 @app.get("/")
